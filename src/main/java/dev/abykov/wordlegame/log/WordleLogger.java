@@ -7,7 +7,7 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public final class WordleLogger implements AutoCloseable {
+public final class WordleLogger implements GameLogger, AutoCloseable {
 
     private static final String DEFAULT_LOG_FILE = "wordle.log";
     private static final DateTimeFormatter FORMATTER =

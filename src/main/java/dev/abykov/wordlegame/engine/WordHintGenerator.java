@@ -7,7 +7,10 @@ import java.util.List;
 
 public class WordHintGenerator {
 
-    public String suggest(WordleDictionary dictionary, List<Guess> guesses) {
+    public String suggest(
+            WordleDictionary dictionary,
+            List<Guess> guesses
+    ) throws WordleGameException {
         for (String candidate : dictionary.getWords()) {
             if (matchesAllGuesses(candidate, guesses)) {
                 return candidate;

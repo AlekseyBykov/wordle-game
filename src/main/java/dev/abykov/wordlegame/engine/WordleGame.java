@@ -4,7 +4,7 @@ import dev.abykov.wordlegame.dict.WordleDictionary;
 import dev.abykov.wordlegame.exception.InvalidWordLengthException;
 import dev.abykov.wordlegame.exception.WordNotFoundException;
 import dev.abykov.wordlegame.exception.WordleGameException;
-import dev.abykov.wordlegame.log.WordleLogger;
+import dev.abykov.wordlegame.log.GameLogger;
 import dev.abykov.wordlegame.util.WordUtils;
 
 import java.util.ArrayList;
@@ -14,7 +14,7 @@ public class WordleGame {
 
     private static final int MAX_STEPS = 6;
 
-    private final WordleLogger log;
+    private final GameLogger log;
     private final WordleDictionary dictionary;
     private final WordHintGenerator hintGenerator;
 
@@ -26,43 +26,49 @@ public class WordleGame {
     public WordleGame(
             WordleDictionary dictionary,
             WordHintGenerator hintGenerator,
-            WordleLogger log
+            GameLogger log,
+            String answer
     ) {
         this.log = log;
         this.dictionary = dictionary;
-
-        this.answer = dictionary.getRandomWord();
         this.hintGenerator = hintGenerator;
-        this.guesses = new ArrayList<>();
 
+        this.answer = answer;
+        this.guesses = new ArrayList<>();
         this.currentStep = 0;
     }
 
-    public String submitGuess(String word) {
-        log.info("Player entered '%s'", word);
-
-        try {
-            String normalizedWord = normalizeAndValidate(word);
-            String result = WordComparator.compare(answer, normalizedWord);
-
-            registerMove(normalizedWord, result);
-
-            guesses.add(new Guess(normalizedWord, result));
-
-            log.info(
-                    "Comparison: '%s' -> '%s'",
-                    normalizedWord,
-                    result
-            );
-
-            return result;
-        } catch (WordleGameException e) {
-            log.error(e, "Guess rejected");
-            throw e;
-        }
+    public WordleGame(
+            WordleDictionary dictionary,
+            WordHintGenerator hintGenerator,
+            GameLogger log
+    ) {
+        this(
+                dictionary,
+                hintGenerator,
+                log,
+                dictionary.getRandomWord()
+        );
     }
 
-    private String normalizeAndValidate(String word) {
+    public String submitGuess(String word) throws WordleGameException {
+        log.info("Player entered '%s'", word);
+
+        String normalizedWord = normalizeAndValidate(word);
+        String result = WordComparator.compare(answer, normalizedWord);
+
+        registerMove(normalizedWord, result);
+
+        log.info(
+                "Comparison: '%s' -> '%s'",
+                normalizedWord,
+                result
+        );
+
+        return result;
+    }
+
+    private String normalizeAndValidate(String word) throws WordleGameException {
         String normalizedWord = WordUtils.normalize(word);
 
         if (!WordUtils.hasValidLength(normalizedWord)) {
@@ -76,7 +82,7 @@ public class WordleGame {
         return normalizedWord;
     }
 
-    public String suggestWord() {
+    public String suggestWord() throws WordleGameException {
         String hint = hintGenerator.suggest(dictionary, guesses);
 
         log.info("Hint suggested: '%s'", hint);

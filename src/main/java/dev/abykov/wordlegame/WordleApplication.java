@@ -6,6 +6,7 @@ import dev.abykov.wordlegame.engine.WordHintGenerator;
 import dev.abykov.wordlegame.engine.WordleGame;
 import dev.abykov.wordlegame.exception.DictionaryLoadException;
 import dev.abykov.wordlegame.exception.WordleGameException;
+import dev.abykov.wordlegame.log.GameLogger;
 import dev.abykov.wordlegame.log.WordleLogger;
 
 import java.io.IOException;
@@ -29,23 +30,11 @@ public class WordleApplication {
                 String input = scanner.nextLine();
 
                 if (input.isBlank()) {
-                    String hint = game.suggestWord();
-                    System.out.println("Подсказка: " + hint);
+                    printHint(game, log);
                     continue;
                 }
 
-                try {
-                    String result = game.submitGuess(input);
-
-                    System.out.println(result);
-                    System.out.println(
-                            "Осталось попыток: "
-                                    + game.getRemainingSteps()
-                    );
-                } catch (WordleGameException e) {
-                    log.error(e, "Guess rejected");
-                    System.out.println(e.getMessage());
-                }
+                processGuess(game, input, log);
             }
 
             log.info(
@@ -70,6 +59,38 @@ public class WordleApplication {
             System.out.println(e.getMessage());
         } catch (IOException e) {
             System.out.println("Не удалось создать лог.");
+        }
+    }
+
+    private static void printHint(
+            WordleGame game,
+            GameLogger log
+    ) {
+        try {
+            String hint = game.suggestWord();
+            System.out.println("Подсказка: " + hint);
+        } catch (WordleGameException e) {
+            log.error(e, "Hint generation failed");
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private static void processGuess(
+            WordleGame game,
+            String input,
+            GameLogger log
+    ) {
+        try {
+            String result = game.submitGuess(input);
+
+            System.out.println(result);
+            System.out.println(
+                    "Осталось попыток: "
+                            + game.getRemainingSteps()
+            );
+        } catch (WordleGameException e) {
+            log.error(e, "Guess rejected");
+            System.out.println(e.getMessage());
         }
     }
 }
