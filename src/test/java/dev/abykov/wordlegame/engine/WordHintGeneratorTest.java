@@ -14,7 +14,7 @@ class WordHintGeneratorTest {
     private final WordHintGenerator generator = new WordHintGenerator();
 
     @Test
-    void shouldReturnFirstDictionaryWordWhenHistoryIsEmpty() {
+    void shouldReturnFirstDictionaryWordWhenHistoryIsEmpty() throws WordleGameException {
         WordleDictionary dictionary = new WordleDictionary(
                 List.of(
                         "банка",
@@ -29,7 +29,7 @@ class WordHintGeneratorTest {
     }
 
     @Test
-    void shouldReturnWordMatchingSinglePreviousHint() {
+    void shouldReturnWordMatchingSinglePreviousHint() throws WordleGameException {
         WordleDictionary dictionary = new WordleDictionary(
                 List.of(
                         "банка",
@@ -48,7 +48,7 @@ class WordHintGeneratorTest {
     }
 
     @Test
-    void shouldReturnWordMatchingAllPreviousHints() {
+    void shouldReturnWordMatchingAllPreviousHints() throws WordleGameException {
         WordleDictionary dictionary = new WordleDictionary(
                 List.of(
                         "кручь",
